@@ -34,8 +34,20 @@ namespace MultiLingualBot
             // Create the Bot Framework Adapter.
             services.AddSingleton<IBotFrameworkHttpAdapter, BotFrameworkHttpAdapter>();
 
+            // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
+            services.AddSingleton<IStorage, MemoryStorage>();
+
+            // Create the User state.
+            services.AddSingleton<UserState>();
+
+            //// Create the Microsoft Translator responsible for making calls to the Cognitive Services translation service
+            //services.AddSingleton<MicrosoftTranslator>();
+
+            //// Create the Translation Middleware that will be added to the middleware pipeline in the AdapterWithErrorHandler
+            //services.AddSingleton<TranslationMiddleware>();
+
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-            services.AddTransient<IBot, EmptyBot>();
+            services.AddTransient<IBot, MultiLingualBot>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
