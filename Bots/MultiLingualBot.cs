@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
+using MultiLingualBot.Translation;
 
 namespace MultiLingualBot
 {
@@ -17,10 +18,12 @@ namespace MultiLingualBot
         private const string WelcomeText = @"Say whatever you want to get started.";
 
         private readonly UserState _userState;
+        private readonly Translator _translator;
 
-        public MultiLingualBot(UserState userState)
+        public MultiLingualBot(UserState userState, Translator translator)
         {
             _userState = userState ?? throw new NullReferenceException(nameof(userState));
+            _translator = translator;
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -30,6 +33,33 @@ namespace MultiLingualBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            var lang = await _translator.DetectLanguageAsync(turnContext.Activity.Text);
+
+            if (lang.Equals("en"))
+            {
+                var reply = ((Activity)turnContext.Activity).CreateReply($"Your current language code is: {lang}");
+
+                await turnContext.SendActivityAsync(reply, cancellationToken);
+
+                // Save the user profile updates into the user state.
+                await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+            }
+            else if (lang.Equals("es"))
+            {
+                var reply = ((Activity)turnContext.Activity).CreateReply("Detencté español, selecciona el idioma con el que quieres continuar:");
+                reply.SuggestedActions = new SuggestedActions()
+                {
+                    Actions = new List<CardAction>()
+                        {
+                            new CardAction() { Title = "Español", Type = ActionTypes.PostBack, Value = "español" },
+                            new CardAction() { Title = "English", Type = ActionTypes.PostBack, Value = "english" },
+                        },
+                };
+
+                await turnContext.SendActivityAsync(reply, cancellationToken);
+            }
+
+
             //if (IsLanguageChangeRequested(turnContext.Activity.Text))
             //{
             //    var currentLang = turnContext.Activity.Text.ToLower();

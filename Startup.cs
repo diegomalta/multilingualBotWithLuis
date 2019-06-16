@@ -11,6 +11,7 @@ using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MultiLingualBot.Translation;
 
 namespace MultiLingualBot
 {
@@ -40,8 +41,8 @@ namespace MultiLingualBot
             // Create the User state.
             services.AddSingleton<UserState>();
 
-            //// Create the Microsoft Translator responsible for making calls to the Cognitive Services translation service
-            //services.AddSingleton<MicrosoftTranslator>();
+            // Create the  Translator responsible for making calls to the Cognitive Services translation service
+            services.AddSingleton<Translator>();
 
             //// Create the Translation Middleware that will be added to the middleware pipeline in the AdapterWithErrorHandler
             //services.AddSingleton<TranslationMiddleware>();
