@@ -33,7 +33,17 @@ namespace MultiLingualBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var lang = await _translator.DetectLanguageAsync(turnContext.Activity.Text);
+            var userStateAccessors = _userState.CreateProperty<UserInfo>(nameof(UserInfo));
+            var userInfo = await userStateAccessors.GetAsync(turnContext, () => new UserInfo());
+
+            string lang = "";
+
+            if (string.IsNullOrEmpty(userInfo.Language))
+            {
+                lang = await _translator.DetectLanguageAsync(turnContext.Activity.Text);
+                userInfo.Language = lang;
+                await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+            }
 
             if (lang.Equals("en"))
             {

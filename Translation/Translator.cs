@@ -61,7 +61,7 @@ namespace MultiLingualBot.Translation
             using (var request = new HttpRequestMessage())
             {
                 // Build the request.
-                var uri = Host + PathDetect + UriParams;
+                var uri = Host + PathDetect;
                 request.Method = HttpMethod.Post;
                 request.RequestUri = new Uri(uri);
                 request.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
