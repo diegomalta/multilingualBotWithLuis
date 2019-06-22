@@ -10,6 +10,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 using MultiLingualBot.Translation;
+using MultiLingualBot.Models;
 
 namespace MultiLingualBot
 {
@@ -33,8 +34,8 @@ namespace MultiLingualBot
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var userStateAccessors = _userState.CreateProperty<UserInfo>(nameof(UserInfo));
-            var userInfo = await userStateAccessors.GetAsync(turnContext, () => new UserInfo());
+            var userStateAccessors = _userState.CreateProperty<UserProfile>(nameof(UserProfile));
+            var userInfo = await userStateAccessors.GetAsync(turnContext, () => new UserProfile());
 
             string lang = "";
 
