@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Choices;
 using MultiLingualBot.Dialogs.Spanish;
 using MultiLingualBot.Models;
 using MultiLingualBot.Services;
@@ -40,6 +41,9 @@ namespace MultiLingualBot.Dialogs
                 FinalStepAsync
             };
 
+            // Add lenguage Dialog
+            AddDialog(new LenguageDialog($"{nameof(MainDialog)}.lenguage", _botStateService));
+
             // Add Named Dialogs
             AddDialog(new GreetingDialog($"{nameof(MainDialog)}.greeting", _botStateService));
             AddDialog(new BugReportDialog($"{nameof(MainDialog)}.bugReport", _botStateService));
@@ -62,29 +66,58 @@ namespace MultiLingualBot.Dialogs
             if (string.IsNullOrEmpty(userProfile.Language))
             {
                 var lang = await _translator.DetectLanguageAsync(stepContext.Context.Activity.Text);
-                userProfile.Language = lang;
-                // Save any state changes that might have occured during the turn.
-                await _botStateService.UserProfileAccessor.SetAsync(stepContext.Context, userProfile);
+
+                // if we detect spanish we need to ask the user if we can continue with spanish
+                if (lang == "es")
+                {
+                    return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.lenguage", null, cancellationToken);
+                }
+                else
+                {
+                    userProfile.Language = "en";
+                    // Save changes
+                    await _botStateService.UserProfileAccessor.SetAsync(stepContext.Context, userProfile);
+                }
             }
 
-            //this is the default LUIS
-            var recognizerResult = await _botServices.Dispatch.RecognizeAsync(stepContext.Context, cancellationToken);
-
-            // Top intent tell us which cognitive service to use.
-            var topIntent = recognizerResult.GetTopScoringIntent();
-
-            switch (topIntent.intent)
+            if (userProfile.Language == "es")
             {
-                case "GreetingIntent":
-                    return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.greeting", null, cancellationToken);
-                case "NewBugReportIntent":
-                    return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugReport", null, cancellationToken);
-                case "QueryBugTypeIntent":
-                    return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugType", null, cancellationToken);
-                default:
-                    await stepContext.Context.SendActivityAsync(MessageFactory.Text($"I'm sorry I don't know what you mean."), cancellationToken);
-                    break;
+                var recognizerResult = await _botServices.DispatchES.RecognizeAsync(stepContext.Context, cancellationToken);
+
+                // Top intent tell us which cognitive service to use.
+                var topIntent = recognizerResult.GetTopScoringIntent();
+
+                switch (topIntent.intent)
+                {                   
+                    case "QueryBugTypeIntent":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugType", null, cancellationToken);
+                    default:
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Perdon, no entiendo lo que me dices"), cancellationToken);
+                        break;
+                }
+
             }
+            else
+            {
+                // this is the EN LUIS
+                var recognizerResult = await _botServices.Dispatch.RecognizeAsync(stepContext.Context, cancellationToken);
+
+                // Top intent tell us which cognitive service to use.
+                var topIntent = recognizerResult.GetTopScoringIntent();
+
+                switch (topIntent.intent)
+                {
+                    case "Greetings":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.greeting", null, cancellationToken);
+                    case "NewBugReportIntent":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugReport", null, cancellationToken);
+                    case "QueryBugTypeIntent":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugType", null, cancellationToken);
+                    default:
+                        await stepContext.Context.SendActivityAsync(MessageFactory.Text($"I'm sorry I don't know what you mean."), cancellationToken);
+                        break;
+                }
+            }            
 
             return await stepContext.NextAsync(null, cancellationToken);
         }

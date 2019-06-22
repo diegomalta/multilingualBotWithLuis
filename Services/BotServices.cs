@@ -18,9 +18,18 @@ namespace MultiLingualBot.Services
                 $"https://{configuration["LuisAPIHostName"]}.api.cognitive.microsoft.com"),
                 new LuisPredictionOptions { IncludeAllIntents = true, IncludeInstanceData = true },
                 true);
+
+            DispatchES = new LuisRecognizer(new LuisApplication(
+                configuration["LuisESAppId"],
+                configuration["LuisESAPIKey"],
+                $"https://{configuration["LuisESAPIHostName"]}.api.cognitive.microsoft.com"),
+                new LuisPredictionOptions { IncludeAllIntents = true, IncludeInstanceData = true },
+                true);
         }
 
         public LuisRecognizer Dispatch { get; private set; }
+
+        public LuisRecognizer DispatchES { get; private set; }
 
     }
 }
