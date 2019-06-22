@@ -40,6 +40,9 @@ namespace MultiLingualBot
             // Create the Bot Framework Adapter.
             services.AddSingleton<IBotFrameworkHttpAdapter, BotFrameworkHttpAdapter>();
 
+            // Configure Services
+            services.AddSingleton<BotServices>();
+
             // Configure State
             ConfigureState(services);
 
