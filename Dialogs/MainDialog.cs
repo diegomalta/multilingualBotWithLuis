@@ -90,8 +90,10 @@ namespace MultiLingualBot.Dialogs
                 
                 switch (topIntent.intent)
                 {                   
-                    case "CrearCuenta":
+                    case "RegisterAccount":
                         return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.accountSpanish", null, cancellationToken);
+                    case "Greetings":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.greetingSpanish", null, cancellationToken);
                     default:
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Perdon, no entiendo lo que me dices"), cancellationToken);
                         break;

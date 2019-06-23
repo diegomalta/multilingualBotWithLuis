@@ -72,7 +72,7 @@ namespace MultiLingualBot.Dialogs.Spanish
                 new PromptOptions
                 {
                     Prompt = MessageFactory.Text("Please enter your Date of Birth"),
-                    RetryPrompt = MessageFactory.Text("incorret."),
+                    RetryPrompt = MessageFactory.Text("Incorrecto, ingresa una fecha de nacimiento correcta"),
                 }, cancellationToken);
         }
 
