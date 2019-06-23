@@ -1,0 +1,27 @@
+{
+    "name": "multilingual",
+    "description": "",
+  "services": [
+    {
+      "type": "endpoint",
+      "appId": "",
+      "appPassword": "",
+      "endpoint": "http://localhost:3978/api/messages",
+      "id": "",
+      "name": "multilingual"
+    },
+    {
+      "type": "luis",
+      "id": "",
+      "name": "",
+      "version": "",
+      "appId": "",
+      "authoringKey": "",
+      "subscriptionKey": "",
+      "region": ""
+    }
+  ],
+    "padlock": "",
+    "version": "2.0",
+    "overrides": null
+}
