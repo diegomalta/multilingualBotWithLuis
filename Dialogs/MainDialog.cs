@@ -50,6 +50,7 @@ namespace MultiLingualBot.Dialogs
 
             // Add Spanish Named Dialogs
             AddDialog(new GreetingDialogSpanish($"{nameof(MainDialog)}.greetingSpanish", _botStateService));
+            AddDialog(new RegisterAccountDialogSpanish($"{nameof(MainDialog)}.accountSpanish", _botStateService));
 
             AddDialog(new WaterfallDialog($"{nameof(MainDialog)}.mainFlow", waterfallSteps));
 
@@ -86,11 +87,11 @@ namespace MultiLingualBot.Dialogs
 
                 // Top intent tell us which cognitive service to use.
                 var topIntent = recognizerResult.GetTopScoringIntent();
-
+                
                 switch (topIntent.intent)
                 {                   
-                    case "QueryBugTypeIntent":
-                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.bugType", null, cancellationToken);
+                    case "CrearCuenta":
+                        return await stepContext.BeginDialogAsync($"{nameof(MainDialog)}.accountSpanish", null, cancellationToken);
                     default:
                         await stepContext.Context.SendActivityAsync(MessageFactory.Text($"Perdon, no entiendo lo que me dices"), cancellationToken);
                         break;
